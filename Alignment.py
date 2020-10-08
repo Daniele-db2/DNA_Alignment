@@ -22,6 +22,7 @@ def SPARKalignment(a, alignments, tab, Aligner,sc): #ALLINEAMENTO CON SPARK
         except StopIteration:
             alignment = Aligner(contig='chr0', flag=4, seq = seq, pos=None, mapq=None, cigar=None, is_primary=False, MDtag=None, cstag=None)
             alignments.append(alignment)
+    #print (alignments[:1])
     rdd = sc.parallelize(alignments)
     seqDF = rdd.map(lambda x: Row(contig=x[0], flag=x[1], seq=x[2], pos=x[3],mapq=x[4], cigar=x[5], is_primary=x[6], MDtag=x[7], cstag=x[8]))
     DF = sqlContext.createDataFrame(seqDF)

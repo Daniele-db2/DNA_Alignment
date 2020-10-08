@@ -1,7 +1,7 @@
 # coding=utf-
 import pyspark.find_spark_home
 import os
-from pyspark import SparkContext, SparkFiles
+from pyspark import SparkContext, SparkFiles, SparkConf
 from Bio import SeqIO
 from pyspark.shell import sqlContext, spark
 from collections import namedtuple
@@ -12,7 +12,9 @@ def SPARKreadFile(sc):
     basedir = os.getcwd()
     filename = os.path.join(basedir,'FAK53004_ae6e213fd4e39f25ca87bf1c770b24c891782abc_0.fastq')
     sc.setLogLevel("WARN")
-    file = open(SparkFiles.get(filename))
+    #file = open(SparkFiles.get(filename))
+    file = sc.textFile(filename)
+    list = file.take(file.count())
     dict = namedtuple('SEQUENCE', ['ID', 'SEQ', 'OP', 'QUAL'])
     DFs = []
     dict_ID = []
@@ -20,7 +22,7 @@ def SPARKreadFile(sc):
     dict_OP = []
     dict_QUAL = []
     counter = 0
-    for i, v in enumerate(file):
+    for i, v in enumerate(list):
         if (i%4 == 0):
             dict_ID.append(v)
         if (i%4 == 1):
@@ -32,11 +34,10 @@ def SPARKreadFile(sc):
             df = dict(ID = dict_ID[counter], SEQ = dict_SEQ[counter], OP = dict_OP[counter], QUAL = dict_QUAL[counter])
             DFs.append(df)
             counter +=1
-    #schemaSeqDF = spark.createDataFrame(DFs)
     rdd = sc.parallelize(DFs)
     seqDF = rdd.map(lambda x: Row(ID=x[0], SEQ=x[1], OP=x[2], QUAL=x[3]))
     schemaSeqDF = sqlContext.createDataFrame(seqDF)
-    file.close()
+    #file.close()
     return schemaSeqDF
 
 
@@ -141,6 +142,7 @@ def HengLireadFile(file):
 # print ("TEMPO PER LETTURA 1: ", end1-start1)
 
 # startS = timer()
+#sc = SparkContext.getOrCreate()
 #data = SPARKreadFile(sc)
 #data.explain(True)
 #data.show()

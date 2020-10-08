@@ -21,7 +21,7 @@ a = mp.Aligner("chr1.fa", preset = "map-ont")
 alignmentsS = []
 alignmentsH = []
 tab = str.maketrans('ACTG', 'TGAC')
-AlignerS = namedtuple('SEQ', ['contig', 'seq', 'flag', 'pos', 'mapq', 'cigar', 'is_primary', 'MDtag', 'cstag']) #SPARK
+AlignerS = namedtuple('SEQ', ['contig', 'flag', 'seq', 'pos', 'mapq', 'cigar', 'is_primary', 'MDtag', 'cstag']) #SPARK
 AlignerH = namedtuple('SEQ', ['contig', 'Rname', 'flag', 'pos', 'mapq', 'cigar', 'seq', 'is_primary', 'MDtag', 'cstag','basequal']) #Heng Li
 
 # startMP = timer()
@@ -30,17 +30,17 @@ DataFrameMP = MultiProcess.mP(a, tab, AlignerS, sc) #MULTIPROCESSORE SPARK
 # print ("SPARK--> TEMPO ALLINEAMENTO CON MULTIPROCESSORI: ", endMP - startMP)
 
 # start = timer()
-#DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPARK
+DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPARK
 # end = timer()
 # print ("SPARK--> TEMPO ALLINEAMENTO IN AMBIENTE DISTRIBUITO: ", end - start)
 
 # startHL = timer()
-# DF = Alignment.HLalignment(a, alignmentsH, tab, AlignerH, sc) #RDD Heng Li
+#DF = Alignment.HLalignment(a, alignmentsH, tab, AlignerH, sc) #RDD Heng Li
 # endHL = timer()
 # print ("HENG LI--> TEMPO ALLINEAMENTO IN AMBIENTE DISTRIBUITO: ", endHL - startHL)
 
-DataFrameMP.show()
-#DataFrame.show()
+#DataFrameMP.show()
+DataFrame.show()
 #DF.show()
 
 outbam = "test.bam"
