@@ -15,10 +15,12 @@ def mP(a, tab, Aligner,sc):
     cores=int(input('Inserisci il numero di processori: '))
     if cores > multiprocessing.cpu_count():
         cores=multiprocessing.cpu_count()
-    print('Using ' +str(cores))
+        print ("Superato il numero massimo di processori,", str(cores), "in uso")
+    else:
+        print(str(cores), "processori in uso")
     processes=[]
     data = ReadFile.SPARKreadFile(sc)
-    dict = data.take(data.count())
+    dict = [x["SEQ"] for x in data.rdd.collect()]
     #dict = ReadFile.HengLireadFile() #Heng Li
     chunk_size=len(dict)/cores
     slices=Chunks(dict,math.ceil(chunk_size))

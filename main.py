@@ -26,12 +26,12 @@ AlignerH = namedtuple('SEQ', ['contig', 'Rname', 'flag', 'pos', 'mapq', 'cigar',
 
 
 # startMP = timer()
-#DataFrameMP = MultiProcess.mP(a, tab, AlignerS, sc) #MULTIPROCESSORE SPARK
+DataFrameMP = MultiProcess.mP(a, tab, AlignerS, sc) #MULTIPROCESSORE SPARK
 # endMP = timer()
 # print ("SPARK--> TEMPO ALLINEAMENTO CON MULTIPROCESSORI: ", endMP - startMP)
 
 # start = timer()
-DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPARK
+#DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPARK
 # end = timer()
 # print ("SPARK--> TEMPO ALLINEAMENTO IN AMBIENTE DISTRIBUITO: ", end - start)
 
@@ -40,12 +40,12 @@ DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPA
 # endHL = timer()
 # print ("HENG LI--> TEMPO ALLINEAMENTO IN AMBIENTE DISTRIBUITO: ", endHL - startHL)
 
-#DataFrameMP.show()
-DataFrame.show()
+DataFrameMP.show()
+#DataFrame.show()
 #DF.show()
 
 
 outbam = "test.bam"
-createBam.SPARKcreateBam(DataFrame, outbam) #SPARK
+#createBam.SPARKcreateBam(DataFrame, outbam) #SPARK
 #createBam.HLcreateBam(DF, outbam) #Heng Li
 #createBam.create_Bam(alignments, outbam)

@@ -5,13 +5,13 @@ from pyspark.shell import spark, sqlContext
 
 def SPARKalignment(a, alignments, tab, Aligner,sc): #ALLINEAMENTO CON SPARK
     data = ReadFile.SPARKreadFile(sc)
-    dict = data.take(data.count())
-    for i in range(0, data.count()):
-        seq = dict[i].SEQ
+    dict = [x["SEQ"] for x in data.rdd.collect()]
+    for i in range(0, len(dict)):
+        seq = dict[i]
         try:
-            hit = next(a.map(dict[i].SEQ, MD=True, cs=True))
+            hit = next(a.map(seq, MD=True, cs=True))
             flag = 0 if hit.strand == 1 else 16
-            seq = dict[i].SEQ if hit.strand == 1 else dict[i].SEQ.translate(tab)[::-1]
+            seq = seq if hit.strand == 1 else seq.translate(tab)[::-1]
             clip = ['' if x == 0 else '{}S'.format(x) for x in (hit.q_st, len(seq) - hit.q_en)]
             if hit.strand == -1:
                 clip = clip[::-1]
@@ -60,7 +60,7 @@ def HLalignment(a, alignments, tab, Aligner,sc):
 def mPalignment(a, tab, Aligner, s, alignments, procname): #SPARK
     print(procname + ' processing')
     for i in range (0,len(s)):
-        seq = s[i].SEQ
+        seq = s[i]
         try:
             hit = next(a.map(seq, MD=True, cs=True))
             flag = 0 if hit.strand == 1 else 16
