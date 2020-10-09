@@ -1,3 +1,4 @@
+import time
 import mappy as mp
 from collections import namedtuple
 from pyspark.sql import SparkSession
@@ -8,12 +9,12 @@ from pyspark import SparkContext
 from timeit import default_timer as timer
 
 #CODICE PER DAG (http://localhost:4040/jobs/)----------------
-# s = SparkSession.builder.master("spark://master:7077").\
-# appName("DNA_Alignment").\
-# config("spark.driver.bindAddress","localhost").\
-# config("spark.ui.port","4040").\
-# getOrCreate()
-# print ("ora")
+s = SparkSession.builder.master("spark://master:7077").\
+appName("DNA_Alignment").\
+config("spark.driver.bindAddress","localhost").\
+config("spark.ui.port","4040").\
+getOrCreate()
+print ("ora")
 #------------------------------------------------------------
 
 sc = SparkContext.getOrCreate()
@@ -26,12 +27,12 @@ AlignerH = namedtuple('SEQ', ['contig', 'Rname', 'flag', 'pos', 'mapq', 'cigar',
 
 
 # startMP = timer()
-DataFrameMP = MultiProcess.mP(a, tab, AlignerS, sc) #MULTIPROCESSORE SPARK
+#DataFrameMP = MultiProcess.mP(a, tab, AlignerS, sc) #MULTIPROCESSORE SPARK
 # endMP = timer()
 # print ("SPARK--> TEMPO ALLINEAMENTO CON MULTIPROCESSORI: ", endMP - startMP)
 
 # start = timer()
-#DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPARK
+DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPARK
 # end = timer()
 # print ("SPARK--> TEMPO ALLINEAMENTO IN AMBIENTE DISTRIBUITO: ", end - start)
 
@@ -40,10 +41,12 @@ DataFrameMP = MultiProcess.mP(a, tab, AlignerS, sc) #MULTIPROCESSORE SPARK
 # endHL = timer()
 # print ("HENG LI--> TEMPO ALLINEAMENTO IN AMBIENTE DISTRIBUITO: ", endHL - startHL)
 
-DataFrameMP.show()
+#DataFrameMP.show()
 #DataFrame.show()
 #DF.show()
 
+print ("hai 60 sec")
+time.sleep(60)
 
 outbam = "test.bam"
 #createBam.SPARKcreateBam(DataFrame, outbam) #SPARK
