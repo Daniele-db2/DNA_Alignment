@@ -1,4 +1,6 @@
 # coding=utf-
+import math
+import random
 import pyspark.find_spark_home
 import os
 from pyspark import SparkContext, SparkFiles, SparkConf
@@ -15,7 +17,7 @@ def SPARKreadFile(sc):
     #file = open(SparkFiles.get(filename))
     file = sc.textFile(filename)
     list = file.take(file.count())
-    dict = namedtuple('SEQUENCE', ['ID', 'SEQ', 'OP', 'QUAL'])
+    dict = namedtuple('SEQUENCE', ['NUMBER','ID', 'SEQ', 'OP', 'QUAL'])
     DFs = []
     dict_ID = []
     dict_SEQ = []
@@ -31,11 +33,11 @@ def SPARKreadFile(sc):
             dict_OP.append(v)
         if (i%4 == 3):
             dict_QUAL.append(v)
-            df = dict(ID = dict_ID[counter], SEQ = dict_SEQ[counter], OP = dict_OP[counter], QUAL = dict_QUAL[counter])
+            df = dict(NUMBER = counter, ID = dict_ID[counter], SEQ = dict_SEQ[counter], OP = dict_OP[counter], QUAL = dict_QUAL[counter])
             DFs.append(df)
             counter +=1
     rdd = sc.parallelize(DFs)
-    seqDF = rdd.map(lambda x: Row(ID=x[0], SEQ=x[1], OP=x[2], QUAL=x[3]))
+    seqDF = rdd.map(lambda x: Row(NUMBER = x[0], ID=x[1], SEQ=x[2], OP=x[3], QUAL=x[4]))
     schemaSeqDF = sqlContext.createDataFrame(seqDF)
     #file.close()
     return schemaSeqDF
@@ -158,10 +160,11 @@ def HengLireadFile(file):
 # BIOreadFile()
 # endBIO = timer()
 # print ("TEMPO PER LETTURA BIO: ", endBIO-startBIO)
-#startHL = timer()
 
+#startHL = timer()
 #dict  = readFile3()
 #for v in dict.values():
 #   print (v[0], v[1], v[2])
 #endHL = timer()
 #print ("TEMPO PER LETTURA HENG LI: ", endHL-startHL)
+

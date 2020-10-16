@@ -9,12 +9,12 @@ from pyspark import SparkContext
 from timeit import default_timer as timer
 
 #CODICE PER DAG (http://localhost:4040/jobs/)----------------
-s = SparkSession.builder.master("spark://master:7077").\
-appName("DNA_Alignment").\
-config("spark.driver.bindAddress","localhost").\
-config("spark.ui.port","4040").\
-getOrCreate()
-print ("ora")
+# s = SparkSession.builder.master("spark://master:7077").\
+# appName("DNA_Alignment").\
+# config("spark.driver.bindAddress","localhost").\
+# config("spark.ui.port","4040").\
+# getOrCreate()
+# print ("ora")
 #------------------------------------------------------------
 
 sc = SparkContext.getOrCreate()
@@ -42,11 +42,11 @@ DataFrame = Alignment.SPARKalignment(a, alignmentsS, tab, AlignerS, sc) #RDD SPA
 # print ("HENG LI--> TEMPO ALLINEAMENTO IN AMBIENTE DISTRIBUITO: ", endHL - startHL)
 
 #DataFrameMP.show()
-#DataFrame.show()
+DataFrame.show()
 #DF.show()
 
-print ("hai 60 sec")
-time.sleep(60)
+# print ("Hai 60 sec")
+# time.sleep(60)
 
 outbam = "test.bam"
 #createBam.SPARKcreateBam(DataFrame, outbam) #SPARK

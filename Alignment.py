@@ -75,4 +75,3 @@ def mPalignment(a, tab, Aligner, s, alignments, procname): #SPARK
         except StopIteration:
             alignment = Aligner(contig='chr0', flag=4, seq=seq, pos=None, mapq=None, cigar=None, is_primary=False, MDtag=None, cstag=None)
             alignments.append(alignment)
-
