@@ -1,13 +1,9 @@
 # coding=utf-
-import math
-import random
-import pyspark.find_spark_home
 import os
-from pyspark import SparkContext, SparkFiles, SparkConf
 from Bio import SeqIO
-from pyspark.shell import sqlContext, spark
+from pyspark.shell import sqlContext
 from collections import namedtuple
-from pyspark.sql import Row, SparkSession
+from pyspark.sql import Row
 from timeit import default_timer as timer
 
 def SPARKreadFile(sc):
