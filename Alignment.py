@@ -1,6 +1,6 @@
 from pyspark.sql import Row
 import ReadFile
-from pyspark.shell import spark, sqlContext
+from pyspark.shell import sqlContext
 
 
 def SPARKalignment(a, alignments, tab, Aligner,sc): #ALLINEAMENTO CON SPARK

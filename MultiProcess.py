@@ -1,8 +1,7 @@
 import multiprocessing
 import math
-from pyspark.shell import spark, sqlContext
+from pyspark.shell import spark
 import Alignment
-from pyspark.sql import Row
 import ReadFile
 
 
