@@ -242,25 +242,3 @@ def aligner(dict,genome,ht):
             print()
     else:
         print()
-
-
-# import ReadFile
-# import os
-# from pyspark import SparkContext
-# import pickle
-#
-#
-# sc = SparkContext.getOrCreate()
-# data = ReadFile.SPARKreadFile(sc)
-# dict = [x["SEQ"] for x in data.rdd.collect()]
-# basedir = os.getcwd()
-# filename = os.path.join(basedir, 'chr1.fa')
-# genome = ''
-# with open(filename, 'r') as f:
-#     for line in f:
-#         if line[0] != '>':
-#             genome +=line.rstrip()
-# binin = open('hash.bin', 'rb')
-# ht = pickle.load(binin)
-# binin.close()
-# aligner(dict, genome, ht)

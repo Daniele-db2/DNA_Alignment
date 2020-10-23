@@ -14,7 +14,7 @@ from collections import namedtuple
 from pyspark.sql.types import StructType,StructField, StringType, IntegerType
 
 
-def Sparkseeds(word, hashDF):
+def Sparkseeds(word, hashDF,sc):
     rddW = sc.parallelize(word)
     schemaWordDF = rddW.map(lambda x: Row(NUM_SEQ=x[0], ID_SEQ=x[1], POS_SEQ=x[2]))
     df = sqlContext.createDataFrame(schemaWordDF)
@@ -46,8 +46,7 @@ def alignerSpark(dict,genome, hashDF, sc):
     for i in range (0,1):
         print ("• Ispezione n°", i+1)
         word = [(i, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
-        reDF = Sparkseeds(word,hashDF)
-        reDF.show()
+        reDF = Sparkseeds(word,hashDF,sc)
         if reDF.count() >= 3:
             dist = [x["dist"] for x in reDF.rdd.collect()]
             re = [x["POS_SEQ"] for x in reDF.rdd.collect()]
@@ -108,18 +107,6 @@ def alignerSpark(dict,genome, hashDF, sc):
             else:
                 print()
 
-#MAIN==============================================================
-sc = SparkContext.getOrCreate()
-data = ReadFile.SPARKreadFile(sc)
-dict = [x["SEQ"] for x in data.rdd.collect()]
-basedir = os.getcwd()
-filename = os.path.join(basedir, 'chr1.fa')
-genome = ''
-with open(filename, 'r') as f:
-    for line in f:
-        if line[0] != '>':
-            genome +=line.rstrip()
-
 # genNT = namedtuple('GENOME', ['SEQ'])
 # gen = []
 # g = genNT(SEQ = genome[40:300000])
@@ -128,35 +115,3 @@ with open(filename, 'r') as f:
 # schemaGen = genRdd.map(lambda x: Row(SEQ = x[0]))
 # genDF = sqlContext.createDataFrame(schemaGen)
 #genDF.show()
-#==================================================================
-
-#CREAZIONE HASHTABLE===============================================
-# ht = {}
-# for i in range (40,10000):
-#     if 'N' in genome[i:i+10]:
-#         continue
-#     HashTable.insert(ht, HashTable.hash_djb2(genome[i:i+10]), i)
-# #print(ht)
-# #HashTable.display_hash(ht)
-#==================================================================
-
-#CREAZIONE FILE BIN================================================
-# binout = open('hash.bin','wb' )
-# data = pickle.dumps(ht)
-# binout.write(data)
-# binout.close()
-
-#300000
-binin = open('hash.bin', 'rb')
-ht = pickle.load(binin)
-binin.close()
-#==================================================================
-
-rdd = sc.parallelize(ht.items())
-schemaHashDF = rdd.map(lambda x: Row(ID_GEN = x[0], POS_GEN = x[1]))
-hashDF = sqlContext.createDataFrame(schemaHashDF)
-#hashDF.show()
-
-# #print ("Inizio Allineamento")
-alignerSpark(dict, genome, hashDF, sc)
-
