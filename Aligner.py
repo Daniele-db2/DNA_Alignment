@@ -1,6 +1,7 @@
 import numpy as np
 import tabulate as tb
 import HashTable
+import Seeds
 
 Infinity = float('inf')
 
@@ -166,38 +167,12 @@ def affine_align(x, y, score=ScoreParam(5, -4, -6, -8)):
     print("Optimal =", opt)
     return M
 
-def seeds(dict, i, k,ht):
-    seedArray = []
-    for j in range(len(dict[i]) - k):
-        hash_subseq = HashTable.hash_djb2(dict[i][j:j + k])
-        if hash_subseq in ht:
-            if j not in seedArray:
-                seedArray.append((j,hash_subseq))
-    dist = []
-    if len(seedArray) > 3:
-        for z in range (len(seedArray)-1):
-            dist.append(seedArray[z+1][0]-seedArray[z][0])
-        re = []
-        for z in range(len(dist)):
-            if dist[z] <= 50:
-                if seedArray[z] in re:
-                    re.append(seedArray[z + 1])
-                else:
-                    re.append(seedArray[z])
-                    re.append(seedArray[z + 1])
-        if len(re)>=3:
-            return re
-        else:
-            return None
-    else:
-        return None
-
 def aligner(dict,genome,ht):
     k = 10
     for i in range (0,10):
         print ("• Ispezione n°", i+1)
         #word = [dict[i][j:j + k] for j in range(0, len(dict[i]) - k)]
-        re = seeds(dict,i,k,ht)
+        re = Seeds.seeds(dict,i,k,ht)
         for r in re:
             print("SeedArray finale:", re)
             # print("0 per Allineamento locale")
