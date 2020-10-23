@@ -186,7 +186,7 @@ def seeds(word,ht):
 
 def aligner(dict,genome,ht):
     k = 10
-    for i in range (0,100):
+    for i in range (0,10):
         print ("• Ispezione n°", i+1)
         word = [dict[i][j:j + k] for j in range(0, len(dict[i]) - k)]
         re, dist, seq_h, pos_seq = seeds(word,ht)
@@ -204,6 +204,7 @@ def aligner(dict,genome,ht):
                 # print("0 per Allineamento locale")
                 # print("1 per Allineamento globale")
                 # scelta = int(input("Scelta tipologia di allineamento: "))
+                print(ht[seq_h])
                 for pos_gen in ht[seq_h]:
                     optloc = None
                     D, B = editDist(dict[i], genome[pos_gen - pos_seq: pos_gen - pos_seq + len(dict[i])])

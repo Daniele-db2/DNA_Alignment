@@ -2,6 +2,7 @@
 import os
 from Bio import SeqIO
 from pyspark.shell import sqlContext
+from pyspark import SparkContext
 from collections import namedtuple
 from pyspark.sql import Row
 from timeit import default_timer as timer
@@ -140,8 +141,11 @@ def HengLireadFile(file):
 # print ("TEMPO PER LETTURA 1: ", end1-start1)
 
 # startS = timer()
-#sc = SparkContext.getOrCreate()
-#data = SPARKreadFile(sc)
+# sc = SparkContext.getOrCreate()
+# data = SPARKreadFile(sc)
+# for i in range(0,data.count()):
+#     row = data.filter(data.NUMBER == i)
+#     print (row.select(row.SEQ).collect())
 #data.explain(True)
 #data.show()
 # endS = timer()
