@@ -166,84 +166,82 @@ def affine_align(x, y, score=ScoreParam(5, -4, -6, -8)):
     print("Optimal =", opt)
     return M
 
-def seeds(word,ht):
+def seeds(dict, i, k,ht):
     seedArray = []
-    pos_seq = 0
-    for seq in word:
-        seq_h = HashTable.hash_djb2(seq)
-        if seq_h in ht:
-            if pos_seq not in seedArray:
-                seedArray.append(pos_seq)
-            else:
-                break
-        else:
-            pos_seq += 1
+    for j in range(len(dict[i]) - k):
+        hash_subseq = HashTable.hash_djb2(dict[i][j:j + k])
+        if hash_subseq in ht:
+            if j not in seedArray:
+                seedArray.append((j,hash_subseq))
     dist = []
-    if len(seedArray) > 0:
-        for z in range (0,len(seedArray)-1):
-            dist.append(seedArray[z+1]-seedArray[z])
-    return seedArray, dist, seq_h, pos_seq
+    if len(seedArray) > 3:
+        for z in range (len(seedArray)-1):
+            dist.append(seedArray[z+1][0]-seedArray[z][0])
+        re = []
+        for z in range(len(dist)):
+            if dist[z] <= 50:
+                if seedArray[z] in re:
+                    re.append(seedArray[z + 1])
+                else:
+                    re.append(seedArray[z])
+                    re.append(seedArray[z + 1])
+        if len(re)>=3:
+            return re
+        else:
+            return None
+    else:
+        return None
 
 def aligner(dict,genome,ht):
     k = 10
     for i in range (0,10):
         print ("• Ispezione n°", i+1)
-        word = [dict[i][j:j + k] for j in range(0, len(dict[i]) - k)]
-        re, dist, seq_h, pos_seq = seeds(word,ht)
-        if len(re) >= 3:
-            seedArray = []
-            for z in range (0,len(dist)):
-                if dist[z] <= 50:
-                    if re[z] in seedArray:
-                        seedArray.append(re[z + 1])
-                    else:
-                        seedArray.append(re[z])
-                        seedArray.append(re[z + 1])
-            if len(seedArray) >= 3:
-                print ("SeedArray finale:",seedArray)
-                # print("0 per Allineamento locale")
-                # print("1 per Allineamento globale")
-                # scelta = int(input("Scelta tipologia di allineamento: "))
-                print(ht[seq_h])
-                for pos_gen in ht[seq_h]:
-                    optloc = None
-                    D, B = editDist(dict[i], genome[pos_gen - pos_seq: pos_gen - pos_seq + len(dict[i])])
-                    if ((100 - (D[len(D)-1][len(D)-1]/ float(len(dict[i])))*100) < 60.0):
-                    #if scelta == 0:
-                        print("-", round(100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100, 2),
-                              "% ---> Local alignment")
-                        A, optloc = local_align(dict[i], genome[pos_gen - pos_seq: pos_gen - pos_seq + len(dict[i])],
-                                                ScoreParam())
-                    else:
-                        print("-", round(100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100, 2),
-                              "% ---> Global alignment")
-                        M = affine_align(dict[i], genome[pos_gen - pos_seq: pos_gen - pos_seq + len(dict[i])], ScoreParam())
-                    if optloc == None:
-                        bt = backtrack(B, optloc, M)
-                        # edit_distance_table = make_table(dict[i][pos_seq:len(dict[i])-pos_seq], genome[pos_gen:pos_gen+len(dict[i])-pos_seq], D, B, bt)
-                        aligned_word_1, aligned_word_2, operations, line = align( genome[(pos_gen - pos_seq):(
-                                    pos_gen - pos_seq + len(dict[i]))], dict[i], bt)
-                        # print(tb.tabulate(edit_distance_table, stralign="right", tablefmt="orgtbl"))
-                        print("Lunghezza sequenze: ", len(dict[i]), "| Numero operazioni: ", len(operations))
-                        print(dict[i])
-                        print(genome[(pos_gen - pos_seq):(pos_gen - pos_seq + len(dict[i]))])
-                        alignment_table = [aligned_word_1, line, operations, line, aligned_word_2]
-                        print(tb.tabulate(alignment_table, tablefmt="orgtbl"))
-                        print()
-                    else:
-                        bt = backtrack(B, optloc, A)
-                        aligned_word_1, aligned_word_2, operations, line = align(genome[(pos_gen - pos_seq):(
-                                    pos_gen - pos_seq + len(dict[i]))], dict[i], bt)
-                        print("Lunghezza sequenze: ", len(dict[i]), "| Numero operazioni: ", len(operations))
-                        print(dict[i])
-                        print(genome[(pos_gen - pos_seq):(pos_gen - pos_seq + len(dict[i]))])
-                        alignment_table = [aligned_word_1, line, operations, line, aligned_word_2]
-                        print(tb.tabulate(alignment_table, tablefmt="orgtbl"))
-                        print()
-            else:
-                print()
+        #word = [dict[i][j:j + k] for j in range(0, len(dict[i]) - k)]
+        re = seeds(dict,i,k,ht)
+        for r in re:
+            print("SeedArray finale:", re)
+            # print("0 per Allineamento locale")
+            # print("1 per Allineamento globale")
+            # scelta = int(input("Scelta tipologia di allineamento: "))
+            for pos_gen in ht[r[1]]:
+                optloc = None
+                D, B = editDist(dict[i], genome[pos_gen - r[0]: pos_gen - r[0] + len(dict[i])])
+                if ((100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100) < 60.0):
+                    # if scelta == 0:
+                    print("-", round(100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100, 2),
+                          "% ---> Local alignment")
+                    A, optloc = local_align(dict[i], genome[pos_gen - r[0]: pos_gen - r[0] + len(dict[i])],
+                                            ScoreParam())
+                else:
+                    print("-", round(100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100, 2),
+                          "% ---> Global alignment")
+                    M = affine_align(dict[i], genome[pos_gen - r[0]: pos_gen - r[0] + len(dict[i])], ScoreParam())
+                if optloc == None:
+                    bt = backtrack(B, optloc, M)
+                    # edit_distance_table = make_table(dict[i][pos_seq:len(dict[i])-pos_seq], genome[pos_gen:pos_gen+len(dict[i])-pos_seq], D, B, bt)
+                    aligned_word_1, aligned_word_2, operations, line = align(genome[(pos_gen - r[0]):(
+                            pos_gen - r[0] + len(dict[i]))], dict[i], bt)
+                    # print(tb.tabulate(edit_distance_table, stralign="right", tablefmt="orgtbl"))
+                    print("Lunghezza sequenze: ", len(dict[i]), "| Numero operazioni: ", len(operations))
+                    print(dict[i])
+                    print(genome[(pos_gen - r[0]):(pos_gen - r[0] + len(dict[i]))])
+                    alignment_table = [aligned_word_1, line, operations, line, aligned_word_2]
+                    print(tb.tabulate(alignment_table, tablefmt="orgtbl"))
+                    print()
+                else:
+                    bt = backtrack(B, optloc, A)
+                    aligned_word_1, aligned_word_2, operations, line = align(genome[(pos_gen - r[0]):(
+                            pos_gen - r[0] + len(dict[i]))], dict[i], bt)
+                    print("Lunghezza sequenze: ", len(dict[i]), "| Numero operazioni: ", len(operations))
+                    print(dict[i])
+                    print(genome[(pos_gen - r[0]):(pos_gen - r[0] + len(dict[i]))])
+                    alignment_table = [aligned_word_1, line, operations, line, aligned_word_2]
+                    print(tb.tabulate(alignment_table, tablefmt="orgtbl"))
+                    print()
         else:
             print()
+    else:
+        print()
 
 
 # import ReadFile

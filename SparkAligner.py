@@ -46,9 +46,8 @@ def alignerSpark(dict,genome, hashDF, sc):
     for i in range (0,1):
         print ("• Ispezione n°", i+1)
         word = [(i, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
-        #Sparkseeds(word,data, dict, i, k, hashDF)
         reDF = Sparkseeds(word,hashDF)
-        #reDF.show()
+        reDF.show()
         if reDF.count() >= 3:
             dist = [x["dist"] for x in reDF.rdd.collect()]
             re = [x["POS_SEQ"] for x in reDF.rdd.collect()]
@@ -75,11 +74,11 @@ def alignerSpark(dict,genome, hashDF, sc):
                             # if scelta == 0:
                             print("-", 100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100,
                                   "% ---> Local alignment")
-                            A, optloc = Aligner.local_align(dict[i],genome[pos_gen - seedArray[z]: pos_gen - seedArray[z] + len(dict[i])],Aligner.ScoreParam())
+                            A, optloc = Aligner.local_align(dict[i],genome[pos_gen - seedArray[z]: pos_gen - seedArray[z] + len(dict[i])],Aligner.ScoreParam()) #Smith-Waterman
                         else:
                             print("-", 100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100,
                                   "% ---> Global alignment")
-                            M = Aligner.affine_align(dict[i],genome[pos_gen - seedArray[z]: pos_gen - seedArray[z] + len(dict[i])],Aligner.ScoreParam())
+                            M = Aligner.affine_align(dict[i],genome[pos_gen - seedArray[z]: pos_gen - seedArray[z] + len(dict[i])],Aligner.ScoreParam()) #Needleman-Wunsch
                         if optloc == None:
                             bt = Aligner.backtrack(B, optloc, M)
                             # edit_distance_table = make_table(dict[i][pos_seq:len(dict[i])-pos_seq], genome[pos_gen:pos_gen+len(dict[i])-pos_seq], D, B, bt)
