@@ -168,6 +168,7 @@ def affine_align(x, y, score=ScoreParam(5, -4, -6, -8)):
     return M
 
 def aligner(dict,genome,ht):
+    print("Inizio Allineamento")
     k = 10
     for i in range (0,10):
         print ("• Ispezione n°", i+1)

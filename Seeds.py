@@ -42,7 +42,7 @@ def Sparkseeds(word, hashDF,sc):
     my_window = Window.partitionBy(reDF.NUM_SEQ).orderBy(reDF.POS_SEQ)
     reDF = reDF.withColumn("prev_value", F.lag(reDF.POS_SEQ).over(my_window))
     reDF = reDF.withColumn("dist", F.when(F.isnull(reDF.POS_SEQ - reDF.prev_value), 0).otherwise(reDF.POS_SEQ - reDF.prev_value))
-    reDF = reDF.select(reDF.ID_SEQ, reDF.POS_SEQ, reDF.dist, reDF.POS_GEN)
+    reDF = reDF.select(reDF.NUM_SEQ, reDF.ID_SEQ, reDF.POS_SEQ, reDF.dist, reDF.POS_GEN)
 
     # schema = StructType([
     #     StructField('segment', StringType(), True),

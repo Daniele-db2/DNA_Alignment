@@ -5,6 +5,7 @@ import HashTable
 
 
 def alignerSpark(dict,genome, hashDF, sc):
+    print("Inizio Allineamento")
     k = 10
     for i in range (0,1):
         print ("• Ispezione n°", i+1)

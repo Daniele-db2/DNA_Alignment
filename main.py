@@ -74,7 +74,7 @@ with open(filename, 'r') as f:
 
 # CREAZIONE HASHTABLE===============================================
 # ht = {}
-# for i in range (40,10000):
+# for i in range (40,300000):
 #     if 'N' in genome[i:i+10]:
 #         continue
 #     HashTable.insert(ht, HashTable.hash_djb2(genome[i:i+10]), i)
@@ -99,7 +99,6 @@ schemaHashDF = rdd.map(lambda x: Row(ID_GEN = x[0], POS_GEN = x[1]))
 hashDF = sqlContext.createDataFrame(schemaHashDF)
 #hashDF.show()
 
-print ("Inizio Allineamento")
 SparkAligner.alignerSpark(dict, genome, hashDF, sc)
 # Aligner.aligner(dict, genome, ht)
 #====================================================================================================================================
