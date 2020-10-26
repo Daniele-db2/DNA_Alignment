@@ -5,9 +5,12 @@ from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 from pyspark.sql.types import StructType,StructField, StringType, IntegerType
 from pyspark.sql.functions import *
+from timeit import default_timer as timer
+from datetime import datetime
 
 
-def seeds(dict, i, k,ht):
+
+def seeds(dict, i, k, ht):
     seedArray = []
     for j in range(len(dict[i]) - k):
         hash_subseq = HashTable.hash_djb2(dict[i][j:j + k])
@@ -33,7 +36,8 @@ def seeds(dict, i, k,ht):
     else:
         return None
 
-def Sparkseeds(word, hashDF,sc):
+def Sparkseeds(dict, i, k, hashDF,sc):
+    word = [(i, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
     rddW = sc.parallelize(word)
     schemaWordDF = rddW.map(lambda x: Row(NUM_SEQ=x[0], ID_SEQ=x[1], POS_SEQ=x[2]))
     df = sqlContext.createDataFrame(schemaWordDF)

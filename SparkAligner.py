@@ -2,6 +2,8 @@ import Seeds
 import Aligner
 import tabulate as tb
 import HashTable
+from timeit import default_timer as timer
+from datetime import datetime
 
 
 def alignerSpark(dict,genome, hashDF, sc):
@@ -9,8 +11,7 @@ def alignerSpark(dict,genome, hashDF, sc):
     k = 10
     for i in range (0,1):
         print ("• Ispezione n°", i+1)
-        word = [(i, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
-        reDF = Seeds.Sparkseeds(word,hashDF,sc)
+        reDF = Seeds.Sparkseeds(dict, i, k, hashDF, sc)
         if reDF.count() >= 3:
             dist = [x["dist"] for x in reDF.rdd.collect()]
             re = [x["POS_SEQ"] for x in reDF.rdd.collect()]
