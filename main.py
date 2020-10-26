@@ -13,6 +13,7 @@ import ReadFile
 import SparkAligner
 import Aligner
 import pickle
+from datetime import datetime
 
 #CODICE PER DAG (http://localhost:4040/jobs/)========================================================================================
 # s = SparkSession.builder.master("spark://master:7077").\
@@ -99,6 +100,17 @@ schemaHashDF = rdd.map(lambda x: Row(ID_GEN = x[0], POS_GEN = x[1]))
 hashDF = sqlContext.createDataFrame(schemaHashDF)
 #hashDF.show()
 
+print ('\033[1m' + 'ALLINEAMENTO CON UTILIZZO DI SPARK:' + '\033[0m')
+startS = datetime.now()
 SparkAligner.alignerSpark(dict, genome, hashDF, sc)
+endS = datetime.now()
+print ('\033[1m' + 'TEMPO CON SPARK: ' + '\033[0m', endS-startS)
+print ("======================================================================================================================================================")
+
+# print ('\033[1m' + 'ALLINEAMENTO SENZA UTILIZZO DI SPARK:' + '\033[0m')
+# start = datetime.now()
 # Aligner.aligner(dict, genome, ht)
+# end = datetime.now()
+# print ('\033[1m' + 'TEMPO SENZA SPARK: ' + '\033[0m', end-start)
+# print ("======================================================================================================================================================")
 #====================================================================================================================================

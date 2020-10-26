@@ -7,10 +7,9 @@ from datetime import datetime
 
 
 def alignerSpark(dict,genome, hashDF, sc):
-    print("Inizio Allineamento")
     k = 10
     for i in range (0,1):
-        print ("• Ispezione n°", i+1)
+        print ("• Allineamento sequenza n°", i+1)
         reDF = Seeds.Sparkseeds(dict, i, k, hashDF, sc)
         if reDF.count() >= 3:
             dist = [x["dist"] for x in reDF.rdd.collect()]

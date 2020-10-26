@@ -168,14 +168,13 @@ def affine_align(x, y, score=ScoreParam(5, -4, -6, -8)):
     return M
 
 def aligner(dict,genome,ht):
-    print("Inizio Allineamento")
     k = 10
-    for i in range (0,10):
-        print ("• Ispezione n°", i+1)
+    for i in range (0,1):
+        print ("• Allineamento sequenza n°", i+1)
         #word = [dict[i][j:j + k] for j in range(0, len(dict[i]) - k)]
         re = Seeds.seeds(dict,i,k,ht)
+        print("SeedArray finale:", re)
         for r in re:
-            print("SeedArray finale:", re)
             # print("0 per Allineamento locale")
             # print("1 per Allineamento globale")
             # scelta = int(input("Scelta tipologia di allineamento: "))
