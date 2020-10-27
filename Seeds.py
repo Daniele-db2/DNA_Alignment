@@ -47,6 +47,10 @@ def Sparkseeds(dict, i, k, hashDF,sc):
     reDF = reDF.withColumn("prev_value", F.lag(reDF.POS_SEQ).over(my_window))
     reDF = reDF.withColumn("dist", F.when(F.isnull(reDF.POS_SEQ - reDF.prev_value), 0).otherwise(reDF.POS_SEQ - reDF.prev_value))
     reDF = reDF.select(reDF.NUM_SEQ, reDF.ID_SEQ, reDF.POS_SEQ, reDF.dist, reDF.POS_GEN)
+    reDF = reDF.withColumn("dist0", F.lead(reDF.dist).over(my_window))
+    elDF = reDF.filter(((reDF.dist == 0) | (reDF.dist >= 50)) & ((reDF.dist0.isNull()) | (reDF.dist0 >= 50)))
+    reDF = reDF.subtract(elDF)
+    reDF = reDF.orderBy(reDF.POS_SEQ).select(reDF.NUM_SEQ, reDF.ID_SEQ, reDF.POS_SEQ, reDF.POS_GEN)
 
     # schema = StructType([
     #     StructField('segment', StringType(), True),
