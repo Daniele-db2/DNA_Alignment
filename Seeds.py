@@ -7,7 +7,7 @@ from pyspark.sql.types import StructType,StructField, StringType, IntegerType
 from pyspark.sql.functions import *
 from timeit import default_timer as timer
 from datetime import datetime
-
+import numpy as np
 
 
 def seeds(dict, i, k, ht):
@@ -36,8 +36,40 @@ def seeds(dict, i, k, ht):
     else:
         return None
 
+def function(reDF):
+    val = [x["POS_SEQ"] for x in reDF.rdd.collect()]
+    interval = [x["POS_GEN"] for x in reDF.rdd.collect()]
+    dict_num = []
+    dict_pos = []
+    for v in range(0, 3):
+        num_array = []
+        idx = 0
+        max_num = 0
+        rangeDF = reDF.filter((reDF.POS_SEQ >= val[v]) & (reDF.POS_SEQ < val[v] + 50))
+        for z in range(len(interval[v])):
+            filter_array_udf = udf(
+                lambda arr: [x for x in arr if ((x < interval[v][z] + 50) & (x > interval[v][z] - 50))],
+                "array<string>")
+            rangeDF = rangeDF.withColumn("num_in",
+                                         when(col("POS_SEQ") != val[v], filter_array_udf(col("POS_GEN"))).otherwise(
+                                             col("POS_GEN")))
+            num = [x["num_in"] for x in rangeDF.rdd.collect()]
+            del (num[0])
+            num = np.concatenate(num, axis=0)
+            num_array.append(len(num))
+        if len(num_array) > 1:
+            max_num = np.max(num_array)
+            idx = np.argmax(num_array)
+            dict_num.append(max_num)
+            dict_pos.append((v, idx))
+        else:
+            dict_num.append(num_array[0])
+            dict_pos.append((v, 0))
+    pos = dict_pos[np.argmax(dict_num)]
+    return pos
+
 def Sparkseeds(dict, i, k, hashDF,sc):
-    word = [(i, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
+    word = [(i+1, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
     rddW = sc.parallelize(word)
     schemaWordDF = rddW.map(lambda x: Row(NUM_SEQ=x[0], ID_SEQ=x[1], POS_SEQ=x[2]))
     df = sqlContext.createDataFrame(schemaWordDF)
@@ -52,16 +84,6 @@ def Sparkseeds(dict, i, k, hashDF,sc):
     reDF = reDF.subtract(elDF)
     reDF = reDF.orderBy(reDF.POS_SEQ).select(reDF.NUM_SEQ, reDF.ID_SEQ, reDF.POS_SEQ, reDF.POS_GEN)
 
-    # schema = StructType([
-    #     StructField('segment', StringType(), True),
-    #     StructField('pos', IntegerType(), True)
-    # ])
-    # df = spark.createDataFrame(spark.sparkContext.emptyRDD(), schema)
-    # seq_i = data.filter(data.SEQ == dict[i]).select(data.SEQ)
-    # for j in range(1,(len(dict[i])-k+1)):
-    #     wordDF = seq_i.select(substring(seq_i.SEQ, j, k).alias('segment'))
-    #     wordDF = wordDF.select('*').withColumn("pos", monotonically_increasing_id()+j-1)
-    #     df = df.union(wordDF)
-    # segment = [x["segment"] for x in df.rdd.collect()]
+    #pos = function(reDF)
 
     return reDF

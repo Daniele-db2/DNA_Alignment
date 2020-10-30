@@ -3,9 +3,10 @@ import tabulate as tb
 import HashTable
 import Seeds
 
+
 Infinity = float('inf')
 
-def editDist(word_1, word_2):
+def createB(word_1, word_2):
     n = len(word_1) + 1
     m = len(word_2) + 1
     D = np.zeros(shape=(n, m), dtype=np.int)
@@ -22,7 +23,7 @@ def editDist(word_1, word_2):
             mo = np.min([deletion, insertion, mismatch])
             B[i,j] = (deletion==mo, mismatch==mo, insertion==mo)
             D[i,j] = mo
-    return D, B
+    return D,B
 
 def backtrack(B_matrix, optloc, A):
     if optloc == None :
@@ -108,7 +109,7 @@ def make_table(word_1, word_2, D, B, bt):
     return table
 
 def make_matrix(sizex, sizey):
-    return [[0]*sizey for i in range(sizex)]
+    return np.zeros( (sizex, sizey) )
 
 class ScoreParam:
     def __init__(self, match = 5, mismatch = -4, gap = -6, gap_start=-8):
@@ -171,7 +172,6 @@ def aligner(dict,genome,ht):
     k = 10
     for i in range (0,1):
         print ("• Allineamento sequenza n°", i+1)
-        #word = [dict[i][j:j + k] for j in range(0, len(dict[i]) - k)]
         re = Seeds.seeds(dict,i,k,ht)
         print("SeedArray finale:", re)
         for r in re:
@@ -180,7 +180,7 @@ def aligner(dict,genome,ht):
             # scelta = int(input("Scelta tipologia di allineamento: "))
             for pos_gen in ht[r[1]]:
                 optloc = None
-                D, B = editDist(dict[i], genome[pos_gen - r[0]: pos_gen - r[0] + len(dict[i])])
+                D, B = createB(dict[i], genome[pos_gen - r[0]: pos_gen - r[0] + len(dict[i])])
                 if ((100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100) < 60.0):
                     # if scelta == 0:
                     print("-", round(100 - (D[len(D) - 1][len(D) - 1] / float(len(dict[i]))) * 100, 2),
@@ -217,3 +217,4 @@ def aligner(dict,genome,ht):
             print()
     else:
         print()
+
