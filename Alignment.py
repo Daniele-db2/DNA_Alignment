@@ -3,9 +3,8 @@ import ReadFile
 from pyspark.shell import sqlContext
 
 
-def SPARKalignment(a, alignments, tab, Aligner,sc): #ALLINEAMENTO CON SPARK
-    data = ReadFile.SPARKreadFile(sc)
-    dict = [x["SEQ"] for x in data.rdd.collect()]
+def SPARKalignment(a, alignments, tab, Aligner,dict): #ALLINEAMENTO CON SPARK
+    dict_map = {}
     for i in range(0, len(dict)):
         seq = dict[i]
         try:
@@ -19,15 +18,11 @@ def SPARKalignment(a, alignments, tab, Aligner,sc): #ALLINEAMENTO CON SPARK
             alignment = Aligner(contig=hit.ctg, flag=flag, seq = seq, pos=hit.r_st, mapq=hit.mapq, cigar=cigar, is_primary=hit.is_primary, MDtag=hit.MD, cstag=hit.cs)
             if hit.mapq >= 10:
                 alignments.append(alignment)
+                dict_map[i] = (hit.r_st,hit.r_en)
         except StopIteration:
             alignment = Aligner(contig='chr0', flag=4, seq = seq, pos=None, mapq=None, cigar=None, is_primary=False, MDtag=None, cstag=None)
             alignments.append(alignment)
-    #print (alignments[:1])
-    rdd = sc.parallelize(alignments)
-    seqDF = rdd.map(lambda x: Row(contig=x[0], flag=x[1], seq=x[2], pos=x[3],mapq=x[4], cigar=x[5], is_primary=x[6], MDtag=x[7], cstag=x[8]))
-    DF = sqlContext.createDataFrame(seqDF)
-    DataFrame = DF.join(data, on=['seq'], how='inner')
-    return DataFrame
+    return dict_map
 
 
 def HLalignment(a, alignments, tab, Aligner,sc):
