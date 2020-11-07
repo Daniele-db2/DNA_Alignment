@@ -69,7 +69,7 @@ def function(reDF):
     return pos
 
 def Sparkseeds(dict, i, k, hashDF,sc):
-    word = [(i+1, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
+    word = [(i, HashTable.hash_djb2(dict[i][j:j + k]), j) for j in range(0, len(dict[i]) - k)]
     rddW = sc.parallelize(word)
     schemaWordDF = rddW.map(lambda x: Row(NUM_SEQ=x[0], ID_SEQ=x[1], POS_SEQ=x[2]))
     df = sqlContext.createDataFrame(schemaWordDF)
